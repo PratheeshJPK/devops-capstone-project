@@ -150,7 +150,7 @@ class TestAccountService(TestCase):
         data = response.get_json()
         self.assertEqual(len(data),10)
     
-    def test_list_all_accounts(self):
+    def test_list_zero_accounts(self):
         """It should test listing account when 0 accounts created"""
 
         response = self.client.get(
@@ -159,3 +159,33 @@ class TestAccountService(TestCase):
         self.assertEqual(response.status_code,status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data),0)
+    
+    def test_update_an_account(self):
+        """It should test updating the account in the service"""
+
+        test_account = AccountFactory()
+
+        response = self.client.post(
+            f"{BASE_URL}",json=test_account.serialize(),content_type="application/json"
+        )
+        self.assertEqual(response.status_code,status.HTTP_201_CREATED)
+
+        new_account = response.get_json()
+        new_account["name"] = "Jack"
+
+        response = self.client.put(
+            f"{BASE_URL}/{new_account['id']}",json=new_account
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_account = response.get_json()
+        self.assertEqual(updated_account["name"], "Jack")
+    
+    def test_update_an_empty_account(self):
+        """It should test updating an empty account in the service"""
+        test_account = AccountFactory()
+        response = self.client.put(
+            f"{BASE_URL}/1",json=test_account.serialize()
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    
