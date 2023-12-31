@@ -25,6 +25,7 @@ HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
 #  T E S T   C A S E S
 ######################################################################
 
+
 class TestAccountService(TestCase):
     """Account Service Tests"""
 
@@ -171,7 +172,7 @@ class TestAccountService(TestCase):
         response = self.client.post(
             f"{BASE_URL}", json=test_account.serialize(), content_type="application/json"
         )
-        self.assertEqual(response.status_code,status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         new_account = response.get_json()
         new_account["name"] = "Jack"
