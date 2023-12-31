@@ -24,6 +24,8 @@ HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestAccountService(TestCase):
     """Account Service Tests"""
 
@@ -132,61 +134,61 @@ class TestAccountService(TestCase):
         response = self.client.get(
             f"{BASE_URL}/{account.id}", content_type="application/json"
         )
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(data["name"],account.name)
-    
+        self.assertEqual(data["name"], account.name)
+
     def test_get_account_not_found(self):
         """It should not Read an Account that is not found"""
         resp = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_list_all_accounts(self):
         """It should test listing all accounts when there are accounts already created"""
 
         accounts = self._create_accounts(10)
         response = self.client.get(
-            f"{BASE_URL}",content_type="application/json"
+            f"{BASE_URL}", content_type="application/json"
         )
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(len(data),10)
-    
+        self.assertEqual(len(data), len(accounts))
+
     def test_list_zero_accounts(self):
         """It should test listing account when 0 accounts created"""
 
         response = self.client.get(
-            f"{BASE_URL}",content_type="application/json"
+            f"{BASE_URL}", content_type="application/json"
         )
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(len(data),0)
-    
+        self.assertEqual(len(data), 0)
+
     def test_update_an_account(self):
         """It should test updating the account in the service"""
 
         test_account = AccountFactory()
 
         response = self.client.post(
-            f"{BASE_URL}",json=test_account.serialize(),content_type="application/json"
+            f"{BASE_URL}", json=test_account.serialize(), content_type="application/json"
         )
-        self.assertEqual(response.status_code,status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         new_account = response.get_json()
         new_account["name"] = "Jack"
 
         response = self.client.put(
-            f"{BASE_URL}/{new_account['id']}",json=new_account
+            f"{BASE_URL}/{new_account['id']}", json=new_account
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_account = response.get_json()
         self.assertEqual(updated_account["name"], "Jack")
-    
+
     def test_update_an_empty_account(self):
         """It should test updating an empty account in the service"""
         test_account = AccountFactory()
         response = self.client.put(
-            f"{BASE_URL}/1",json=test_account.serialize()
+            f"{BASE_URL}/1", json=test_account.serialize()
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -195,7 +197,7 @@ class TestAccountService(TestCase):
         account = self._create_accounts(1)[0]
         resp = self.client.delete(f"{BASE_URL}/{account.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-    
+
     def test_cors_security(self):
         """It should return a CORS header"""
         response = self.client.get('/', environ_overrides=HTTPS_ENVIRON)
@@ -215,4 +217,3 @@ class TestAccountService(TestCase):
         }
         for key, value in headers.items():
             self.assertEqual(response.headers.get(key), value)
-    
